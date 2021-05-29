@@ -1,5 +1,8 @@
 import java.net.*;
 import java.util.ArrayList;
+
+import javax.xml.crypto.Data;
+
 import java.io.*;
 
 public class Client {
@@ -18,10 +21,9 @@ public class Client {
     private static int jCore;
     private static int jMemory;
     private static int jDisk;
-    private static int jbId = 0;
-    private static int dataLength;
-    private static String[] temp;
+    private static int jbId;
     private static final String dot = ".";
+
 
     // global variables initialised for holding important shceduling data
     private static int smallestCS = 0;
@@ -51,7 +53,7 @@ public class Client {
 
         while (!str.equals(NONE)) {
 
-            // readLineCatchUp(s, bf);
+            readLineCatchUp(s, bf);
 
             jobStatus(pw, bf);
 
@@ -90,10 +92,10 @@ public class Client {
             serverHold.add(si);
         }
         smallestCS = serverHold.get(serverHold.size()-1).coreCount;
-        smallestSID = serverHold.get(0).id;
-        smallestST = serverHold.get(0).type;
-        for (int i = serverHold.size()-1; i > 0; i--) {
-            if (serverHold.get(i).coreCount >= smallestCS) {
+        smallestSID = serverHold.get(serverHold.size()-1).id;
+        smallestST = serverHold.get(serverHold.size()-1).type;
+        for (int i = serverHold.size()-1 ; i > 0; i--) {
+            if (serverHold.get(i).coreCount > smallestCS) {
                 smallestCS = serverHold.get(i).coreCount;
                 smallestSID = serverHold.get(i).id;
                 smallestST = serverHold.get(i).type;
@@ -105,39 +107,43 @@ public class Client {
     // this function is responsible for sending the GETS All message to get all
     // server information and add it into an ArrayList
     public static void getLargestServer(Socket s, PrintWriter pw, BufferedReader bf) {
+        String [] Data;
         String reply = "";
         ArrayList<String> SLI = new ArrayList<>();
         ServerInfo si = new ServerInfo();
+        
         try {
             if(str.contains(JOBN)){
                 String[] hold = str.split("\\s+");
                 jCore = Integer.parseInt(hold[4]);
                 jMemory = Integer.parseInt(hold[5]);
                 jDisk = Integer.parseInt(hold[6]);
+                
             }
             pw.println(GETS + " " + jCore + " " + jMemory + " " +jDisk);
             pw.flush();
-            // System.out.println("Client sent :" + GETS + " " + jCore + " " + jMemory + " " +jDisk);
+            
             reply = bf.readLine();
-            System.out.println("server outer : " + reply);
-            temp = reply.split("\\s+");
-            dataLength = Integer.parseInt(temp[1]);
+            
+            Data = reply.split("\\s+");
             pw.println(OK);
             pw.flush();
-            for(int i = 0; i < dataLength; i++ ){
+            Integer Server = Integer.parseInt(Data[1]);
+            for(int i = 0; i < Server; i++){
                 reply = bf.readLine();
-                System.out.println("server inner: " + reply);
+                
                 if (!reply.equals(dot)) {
                     SLI.add(reply);
-                    System.out.println(SLI);
+                    
 
                 }
             }
             pw.println(OK);
             pw.flush();
-            createServerInfo(SLI);
-            System.out.println(reply);
             
+
+            createServerInfo(SLI);
+            // System.out.println("POOP " + str);
         } catch (Exception e) {
             System.out.println("Error: ArrayList invalid");
             e.printStackTrace();
@@ -146,18 +152,17 @@ public class Client {
 
     // a delay on the readLine created from GETS is fixed through this function
     // cathcing up readLine to the current message
-    // public static void readLineCatchUp(Socket s, BufferedReader bf) {
-    //     try {
-            
-    //         while (str.equals(dot) || str.equals("")) {
-    //             str = bf.readLine();
-    //         }
-    //     } catch (IOException e) {
-    //         System.out.println("Error: readLineCatchUp invalid");
-    //         e.printStackTrace();
-    //     }
+    public static void readLineCatchUp(Socket s, BufferedReader bf) {
+        try {
+            while (str.equals(dot) || str.equals("")) {
+                str = bf.readLine();
+            }
+        } catch (IOException e) {
+            System.out.println("Error: readLineCatchUp invalid");
+            e.printStackTrace();
+        }
 
-    // }
+    }
 
     // intial handshake between client-server where client is authenticated before
     // proceeding to job scheduling
@@ -168,19 +173,19 @@ public class Client {
             pw.println((HELO));
             pw.flush();
             str = bf.readLine();
-            System.out.println("server : " + str);
+            // System.out.println("server : " + str);
 
             pw.println(AUTH + " " + userName);
             pw.flush();
 
             str = bf.readLine();
-            System.out.println("server : " + str);
+            // System.out.println("server : " + str);
 
             pw.println(REDY);
             pw.flush();
 
             str = bf.readLine();
-            System.out.println("server : " + str);
+            // System.out.println("server : " + str);
         } catch (IOException e) {
             System.out.println("Error: handshake invalid");
             e.printStackTrace();
@@ -196,7 +201,7 @@ public class Client {
                 pw.println(REDY);
                 pw.flush();
                 str = bf.readLine();
-                System.out.println("server : " + str);
+                // System.out.println("server : " + str);
             }
         } catch (IOException e) {
             System.out.println("Error: jobStatus invalid");
@@ -207,9 +212,11 @@ public class Client {
     // the scheduling of jobs by splitting the JOBN string and taking the job ID to
     // use in the schedule message along with biggestST and biggestSID
     public static void schedJob(PrintWriter pw, BufferedReader bf) {
+        
         try {
-            if (str.contains(JOBN)) {
-                System.out.println("Coochy mumma " + str);
+            if (str.contains(JOBN) && !str.contains(".")) {
+                // System.out.println("SHIT " + str);
+
                 String[] hold = str.split("\\s+");
                 jbId = Integer.parseInt(hold[2]);
                 
@@ -217,8 +224,9 @@ public class Client {
                 pw.println(SCHD + " " + jbId + " " + smallestST + " " + smallestSID);
                 pw.flush();
                 str = bf.readLine();
-                System.out.println("server : " + str);
-                
+            // System.out.println("server : " + str);
+            //     str = bf.readLine();
+                // System.out.println("server cum: " + str);
             }
         } catch (IOException e) {
             System.out.println("Error: schedJob invalid");
@@ -248,14 +256,15 @@ public class Client {
 
     // gets the next job from the server
     public static void nextJob(PrintWriter pw, BufferedReader bf) {
-        
         try {
-            str = bf.readLine();
             if (str.equals(OK)) {
                 pw.println(REDY);
                 pw.flush();
                 str = bf.readLine();
-                System.out.println("server : " + str);
+                
+                String[] hold = str.split("\\s+");
+                jbId = Integer.parseInt(hold[2]);
+                
             }
         } catch (IOException e) {
             System.out.println("Error: nextJob invalid");
@@ -264,13 +273,16 @@ public class Client {
     }
 
     public static void getsCapable(PrintWriter pw, BufferedReader bf){
+
+        
+        String[] Data;
         String reply = "";
         ArrayList<String> SLI = new ArrayList<>();
         ServerInfo si = new ServerInfo();
         
         try {
             if(str.contains(JOBN) && jbId != 0){
-                System.out.println("This is: " + jbId);
+                
                 String[] hold = str.split("\\s+");
                 jCore = Integer.parseInt(hold[4]);
                 jMemory = Integer.parseInt(hold[5]);
@@ -278,23 +290,25 @@ public class Client {
             
             pw.println(GETS + " " + jCore + " " + jMemory + " " +jDisk);
             pw.flush();
-            System.out.println("Client sent :" + GETS + " " + jCore + " " + jMemory + " " +jDisk);
+            
             reply = bf.readLine();
-            System.out.println("server outer : " + reply);
+            
+            Data = reply.split("\\s+");
+            Integer Servers = Integer.parseInt(Data[1]);
+            
             pw.println(OK);
             pw.flush();
-            for(int i = 0; i < dataLength; i++ ){
+            for(int i = 0; i < Servers; i++){
                 reply = bf.readLine();
-                System.out.println("server inner: " + reply);
+                
                 if (!reply.equals(dot)) {
                     SLI.add(reply);
-                    System.out.println(SLI);
+                    
 
                 }
             }
             pw.println(OK);
             pw.flush();
-            reply = bf.readLine();
             createServerInfo(SLI);
         }
         } catch (Exception e) {
