@@ -14,9 +14,11 @@ public class Client {
     private static String QUIT = "QUIT";
     private static String JOBN = "JOBN";
     private static String JCPL = "JCPL";
+    private static String active = "";
     private static int jCore;
     private static int jMemory;
     private static int jDisk;
+    private static int jbId;
     private static final String dot = ".";
 
     // global variables initialised for holding important shceduling data
@@ -53,6 +55,8 @@ public class Client {
 
             nextJob(pw, bf);
 
+            getsCapable(pw, bf);
+
             schedJob(pw, bf);
 
             if (str.equals(NONE)) {
@@ -77,6 +81,7 @@ public class Client {
             SLIHold = SLI.get(i).split("\\s+");
             si.type = SLIHold[0];
             si.id = Integer.parseInt(SLIHold[1]);
+            
             si.coreCount = Integer.parseInt(SLIHold[4]);
             si.memory = Integer.parseInt(SLIHold[5]);
             si.disk = Integer.parseInt(SLIHold[6]);
@@ -195,10 +200,10 @@ public class Client {
     // use in the schedule message along with biggestST and biggestSID
     public static void schedJob(PrintWriter pw, BufferedReader bf) {
         try {
-            if (str.contains(JOBN)) {
+            if (str.contains(JOBN) && !str.contains(".")) {
 
                 String[] hold = str.split("\\s+");
-                int jbId = Integer.parseInt(hold[2]);
+                jbId = Integer.parseInt(hold[2]);
                 
 
                 pw.println(SCHD + " " + jbId + " " + biggestST + " " + biggestSID);
@@ -243,6 +248,44 @@ public class Client {
             }
         } catch (IOException e) {
             System.out.println("Error: nextJob invalid");
+            e.printStackTrace();
+        }
+    }
+
+    public static void getsCapable(PrintWriter pw, BufferedReader bf){
+        String reply = "";
+        ArrayList<String> SLI = new ArrayList<>();
+        ServerInfo si = new ServerInfo();
+        
+        try {
+            if(str.contains(JOBN) && jbId != 0){
+                System.out.println("This is: " + jbId);
+                String[] hold = str.split("\\s+");
+                jCore = Integer.parseInt(hold[4]);
+                jMemory = Integer.parseInt(hold[5]);
+                jDisk = Integer.parseInt(hold[6]);
+            
+            pw.println(GETS + " " + jCore + " " + jMemory + " " +jDisk);
+            pw.flush();
+            System.out.println("Client sent :" + GETS + " " + jCore + " " + jMemory + " " +jDisk);
+            reply = bf.readLine();
+            System.out.println("server outer : " + reply);
+            while (!reply.equals(dot)) {
+                pw.println(OK);
+                pw.flush();
+                reply = bf.readLine();
+                System.out.println("server inner: " + reply);
+                if (!reply.equals(dot)) {
+                    SLI.add(reply);
+                    System.out.println(SLI);
+
+                }
+            }
+
+            createServerInfo(SLI);
+        }
+        } catch (Exception e) {
+            System.out.println("Error: ArrayList invalid");
             e.printStackTrace();
         }
     }
