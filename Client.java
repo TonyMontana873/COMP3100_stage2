@@ -22,9 +22,9 @@ public class Client {
     private static final String dot = ".";
 
     // global variables initialised for holding important shceduling data
-    private static int biggestCS = 0;
-    private static int biggestSID = 0;
-    private static String biggestST = "";
+    private static int smallestCS = 0;
+    private static int smallestSID = 0;
+    private static String smallestST = "";
 
     // global variable to hold messages sent from server
     private static String str = "";
@@ -87,14 +87,14 @@ public class Client {
             si.disk = Integer.parseInt(SLIHold[6]);
             serverHold.add(si);
         }
-        biggestCS = serverHold.get(0).coreCount;
-        biggestSID = serverHold.get(0).id;
-        biggestST = serverHold.get(0).type;
-        for (int i = 0; i < serverHold.size(); i++) {
-            if (serverHold.get(i).coreCount > biggestCS) {
-                biggestCS = serverHold.get(i).coreCount;
-                biggestSID = serverHold.get(i).id;
-                biggestST = serverHold.get(i).type;
+        smallestCS = serverHold.get(0).coreCount;
+        smallestSID = serverHold.get(0).id;
+        smallestST = serverHold.get(0).type;
+        for (int i = serverHold.size()-1 ; i > 0; i--) {
+            if (serverHold.get(i).coreCount > smallestCS) {
+                smallestCS = serverHold.get(i).coreCount;
+                smallestSID = serverHold.get(i).id;
+                smallestST = serverHold.get(i).type;
             }
         }
 
@@ -206,7 +206,7 @@ public class Client {
                 jbId = Integer.parseInt(hold[2]);
                 
 
-                pw.println(SCHD + " " + jbId + " " + biggestST + " " + biggestSID);
+                pw.println(SCHD + " " + jbId + " " + smallestST + " " + smallestSID);
                 pw.flush();
                 str = bf.readLine();
                 System.out.println("server : " + str);
