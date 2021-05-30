@@ -14,7 +14,6 @@ public class Client {
     private static String QUIT = "QUIT";
     private static String JOBN = "JOBN";
     private static String JCPL = "JCPL";
-    private static String active = "";
     private static int jCore;
     private static int jMemory;
     private static int jDisk;
@@ -46,7 +45,7 @@ public class Client {
 
         handShake(pw, bf);
 
-        getLargestServer(s, pw, bf);
+        getServer(s, pw, bf);
 
         while (!str.equals(NONE)) {
 
@@ -103,11 +102,10 @@ public class Client {
 
     // this function is responsible for sending the GETS All message to get all
     // server information and add it into an ArrayList
-    public static void getLargestServer(Socket s, PrintWriter pw, BufferedReader bf) {
+    public static void getServer(Socket s, PrintWriter pw, BufferedReader bf) {
         String [] Data;
         String reply = "";
         ArrayList<String> SLI = new ArrayList<>();
-        ServerInfo si = new ServerInfo();
         
         try {
             if(str.contains(JOBN)){
