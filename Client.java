@@ -91,7 +91,7 @@ public class Client {
         smallestSID = serverHold.get(serverHold.size()-1).id;
         smallestST = serverHold.get(serverHold.size()-1).type;
         for (int i = serverHold.size()-1 ; i > 0; i--) {
-            if (serverHold.get(i).coreCount > smallestCS) {
+            if (serverHold.get(i).coreCount < smallestCS) {
                 smallestCS = serverHold.get(i).coreCount;
                 smallestSID = serverHold.get(i).id;
                 smallestST = serverHold.get(i).type;
