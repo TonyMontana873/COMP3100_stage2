@@ -1,8 +1,5 @@
 import java.net.*;
 import java.util.ArrayList;
-
-import javax.xml.crypto.Data;
-
 import java.io.*;
 
 public class Client {
@@ -122,9 +119,7 @@ public class Client {
             }
             pw.println(GETS + " " + jCore + " " + jMemory + " " +jDisk);
             pw.flush();
-            
             reply = bf.readLine();
-            
             Data = reply.split("\\s+");
             pw.println(OK);
             pw.flush();
@@ -134,16 +129,12 @@ public class Client {
                 
                 if (!reply.equals(dot)) {
                     SLI.add(reply);
-                    
-
                 }
             }
             pw.println(OK);
             pw.flush();
-            
-
             createServerInfo(SLI);
-            // System.out.println("POOP " + str);
+            
         } catch (Exception e) {
             System.out.println("Error: ArrayList invalid");
             e.printStackTrace();
@@ -173,19 +164,13 @@ public class Client {
             pw.println((HELO));
             pw.flush();
             str = bf.readLine();
-            // System.out.println("server : " + str);
-
             pw.println(AUTH + " " + userName);
             pw.flush();
-
             str = bf.readLine();
-            // System.out.println("server : " + str);
-
             pw.println(REDY);
             pw.flush();
 
             str = bf.readLine();
-            // System.out.println("server : " + str);
         } catch (IOException e) {
             System.out.println("Error: handshake invalid");
             e.printStackTrace();
@@ -201,7 +186,6 @@ public class Client {
                 pw.println(REDY);
                 pw.flush();
                 str = bf.readLine();
-                // System.out.println("server : " + str);
             }
         } catch (IOException e) {
             System.out.println("Error: jobStatus invalid");
@@ -215,18 +199,11 @@ public class Client {
         
         try {
             if (str.contains(JOBN) && !str.contains(".")) {
-                // System.out.println("SHIT " + str);
-
                 String[] hold = str.split("\\s+");
                 jbId = Integer.parseInt(hold[2]);
-                
-
                 pw.println(SCHD + " " + jbId + " " + smallestST + " " + smallestSID);
                 pw.flush();
                 str = bf.readLine();
-            // System.out.println("server : " + str);
-            //     str = bf.readLine();
-                // System.out.println("server cum: " + str);
             }
         } catch (IOException e) {
             System.out.println("Error: schedJob invalid");
@@ -272,14 +249,10 @@ public class Client {
         }
     }
 
-    public static void getsCapable(PrintWriter pw, BufferedReader bf){
-
-        
+    public static void getsCapable(PrintWriter pw, BufferedReader bf){    
         String[] Data;
         String reply = "";
         ArrayList<String> SLI = new ArrayList<>();
-        ServerInfo si = new ServerInfo();
-        
         try {
             if(str.contains(JOBN) && jbId != 0){
                 
@@ -290,21 +263,15 @@ public class Client {
             
             pw.println(GETS + " " + jCore + " " + jMemory + " " +jDisk);
             pw.flush();
-            
             reply = bf.readLine();
-            
             Data = reply.split("\\s+");
             Integer Servers = Integer.parseInt(Data[1]);
-            
             pw.println(OK);
             pw.flush();
             for(int i = 0; i < Servers; i++){
                 reply = bf.readLine();
-                
                 if (!reply.equals(dot)) {
                     SLI.add(reply);
-                    
-
                 }
             }
             pw.println(OK);
