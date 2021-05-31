@@ -14,10 +14,6 @@ public class Client {
     private static String QUIT = "QUIT";
     private static String JOBN = "JOBN";
     private static String JCPL = "JCPL";
-    private static int jCore;
-    private static int jMemory;
-    private static int jDisk;
-    private static int jbId;
     private static final String dot = ".";
 
 
@@ -25,6 +21,10 @@ public class Client {
     private static int smallestCS = 0;
     private static int smallestSID = 0;
     private static String smallestST = "";
+    private static int jCore;
+    private static int jMemory;
+    private static int jDisk;
+    private static int jbId;
 
     // global variable to hold messages sent from server
     private static String str = "";
@@ -71,7 +71,7 @@ public class Client {
     // this method is responsible for taking the ArrayList parameter looping through
     // it and splitting each String of the list into an array so that the indexes of
     // that array can be assigned to the attributes of the ServerInfo object.
-    // the object is added to a seperate ArrayList where the allToLargest is checked
+    // the object is added to a seperate ArrayList where the smallest server is checked
     // on the coreCount of each ServerInfo object
     public static void createServerInfo(ArrayList<String> SLI) {
         ArrayList<ServerInfo> serverHold = new ArrayList<>();
@@ -100,7 +100,7 @@ public class Client {
 
     }
 
-    // this function is responsible for sending the GETS All message to get all
+    // this function is responsible for sending the initial GETS Capable message to get
     // server information and add it into an ArrayList
     public static void getServer(Socket s, PrintWriter pw, BufferedReader bf) {
         String [] Data;
@@ -247,6 +247,8 @@ public class Client {
         }
     }
 
+    // essentially the same as getServer, however this executes in the main
+    // while loop to get servers for every job
     public static void getsCapable(PrintWriter pw, BufferedReader bf){    
         String[] Data;
         String reply = "";
