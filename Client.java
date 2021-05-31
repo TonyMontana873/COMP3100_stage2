@@ -14,6 +14,10 @@ public class Client {
     private static String QUIT = "QUIT";
     private static String JOBN = "JOBN";
     private static String JCPL = "JCPL";
+    private static int jCore;
+    private static int jMemory;
+    private static int jDisk;
+    private static int jbId;
     private static final String dot = ".";
 
 
@@ -21,10 +25,6 @@ public class Client {
     private static int smallestCS = 0;
     private static int smallestSID = 0;
     private static String smallestST = "";
-    private static int jCore;
-    private static int jMemory;
-    private static int jDisk;
-    private static int jbId;
 
     // global variable to hold messages sent from server
     private static String str = "";
@@ -91,7 +91,7 @@ public class Client {
         smallestSID = serverHold.get(serverHold.size()-1).id;
         smallestST = serverHold.get(serverHold.size()-1).type;
         for (int i = serverHold.size()-1 ; i > 0; i--) {
-            if (serverHold.get(i).coreCount < smallestCS) {
+            if (serverHold.get(i).coreCount > smallestCS) {
                 smallestCS = serverHold.get(i).coreCount;
                 smallestSID = serverHold.get(i).id;
                 smallestST = serverHold.get(i).type;
@@ -100,7 +100,7 @@ public class Client {
 
     }
 
-    // this function is responsible for sending the initial GETS Capable message to get
+    // this function is responsible for sending the initial GETS Capable message
     // server information and add it into an ArrayList
     public static void getServer(Socket s, PrintWriter pw, BufferedReader bf) {
         String [] Data;
@@ -229,7 +229,7 @@ public class Client {
         }
     }
 
-    // gets the next job from the server
+    // gets the next job from the server and gathers jobID for next job
     public static void nextJob(PrintWriter pw, BufferedReader bf) {
         try {
             if (str.equals(OK)) {
@@ -247,8 +247,7 @@ public class Client {
         }
     }
 
-    // essentially the same as getServer, however this executes in the main
-    // while loop to get servers for every job
+    // similar to getServer, this method is called everytime a job is recieved
     public static void getsCapable(PrintWriter pw, BufferedReader bf){    
         String[] Data;
         String reply = "";
